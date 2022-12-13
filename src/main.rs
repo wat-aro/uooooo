@@ -3,8 +3,8 @@ use std::{
     io::{stdin, Read},
 };
 
+use atty::{self, Stream};
 use clap::{builder::NonEmptyStringValueParser, Arg, Command};
-use nix::{libc::STDIN_FILENO, unistd::isatty};
 
 fn main() {
     if is_pipe() {
@@ -44,9 +44,5 @@ fn cli() -> Command {
 }
 
 fn is_pipe() -> bool {
-    if let Ok(b) = isatty(STDIN_FILENO) {
-        !b
-    } else {
-        false
-    }
+    !atty::is(Stream::Stdin)
 }
