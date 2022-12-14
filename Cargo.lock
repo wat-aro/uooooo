@@ -326,6 +326,7 @@ dependencies = [
  "assert_cmd",
  "atty",
  "clap",
+ "libc",
  "thiserror",
 ]
 

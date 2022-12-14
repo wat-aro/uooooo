@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 atty = "0.2.14"
 clap = "4.0.29"
+libc = "0.2.138"
 thiserror = "1.0.37"
 
 [dev-dependencies]

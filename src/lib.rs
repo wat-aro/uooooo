@@ -17,6 +17,7 @@ enum Instruction {
     Increment,
     Decrement,
     Print,
+    Read,
     Begin,
     End,
 }
@@ -31,6 +32,7 @@ fn parse(input: &str) -> Vec<Instruction> {
             '+' => instructions.push(Increment),
             '-' => instructions.push(Decrement),
             '.' => instructions.push(Print),
+            ',' => instructions.push(Read),
             '[' => instructions.push(Begin),
             ']' => instructions.push(End),
             _ => {}
@@ -86,6 +88,12 @@ impl Machine {
                     }
                     None => return Err(InvalidChar(self.current_value())),
                 },
+                Read => {
+                    if let Some(x) = self.memory.get_mut(self.current) {
+                        *x = getchar();
+                        self.pc += 1;
+                    }
+                }
                 Begin => {
                     self.stack.push(self.pc);
                     self.pc += 1;
@@ -149,4 +157,8 @@ enum MachineError {
     PointerAccessViolation(isize),
     #[error("Unmached Begin and end.")]
     UnmatchedBeginEnd,
+}
+
+fn getchar() -> u8 {
+    unsafe { libc::getchar() as u8 }
 }
