@@ -12,6 +12,7 @@ pub fn run(input: String) {
 
 #[derive(Debug)]
 enum Instruction {
+    NextPtr,
     Increment,
     Decrement,
     Print,
@@ -22,6 +23,7 @@ fn parse(input: &str) -> Vec<Instruction> {
 
     for c in input.chars() {
         match c {
+            '>' => instructions.push(NextPtr),
             '+' => instructions.push(Increment),
             '-' => instructions.push(Decrement),
             '.' => instructions.push(Print),
@@ -53,6 +55,9 @@ impl Machine {
     pub fn run(&mut self) -> Result<(), MachineError> {
         while let Some(instruction) = self.instructions.get(self.pc) {
             match instruction {
+                NextPtr => {
+                    self.next_ptr()?;
+                }
                 Increment => {
                     self.increment();
                 }
@@ -68,6 +73,15 @@ impl Machine {
         }
 
         Ok(())
+    }
+
+    fn next_ptr(&mut self) -> Result<(), MachineError> {
+        self.current += 1;
+        if self.current > 255 {
+            Err(PointerAccessViolation(self.current))
+        } else {
+            Ok(())
+        }
     }
 
     fn increment(&mut self) {
@@ -91,4 +105,6 @@ impl Machine {
 enum MachineError {
     #[error("Invalid char code {0}")]
     InvalidChar(u8),
+    #[error("Pointer access violation. Pointer must be more than or equal 0 and less than 256, but it is {0}")]
+    PointerAccessViolation(usize),
 }

@@ -24,3 +24,12 @@ fn abc_and_newline() {
         .success()
         .stdout("ABC\n");
 }
+
+#[test]
+fn abc_and_newline_next_ptr() {
+    uooooo()
+        .arg("ABC_and_newline_next_ptr.bf")
+        .assert()
+        .success()
+        .stdout("ABC\n");
+}
