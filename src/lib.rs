@@ -17,6 +17,8 @@ enum Instruction {
     Increment,
     Decrement,
     Print,
+    Begin,
+    End,
 }
 
 fn parse(input: &str) -> Vec<Instruction> {
@@ -29,6 +31,8 @@ fn parse(input: &str) -> Vec<Instruction> {
             '+' => instructions.push(Increment),
             '-' => instructions.push(Decrement),
             '.' => instructions.push(Print),
+            '[' => instructions.push(Begin),
+            ']' => instructions.push(End),
             _ => {}
         }
     }
@@ -42,6 +46,7 @@ struct Machine {
     pc: usize,
     current: usize,
     memory: [u8; 256],
+    stack: Vec<usize>,
 }
 
 impl Machine {
@@ -51,6 +56,7 @@ impl Machine {
             pc: 0,
             current: 0,
             memory: [0; 256],
+            stack: Vec::new(),
         }
     }
 
@@ -59,22 +65,42 @@ impl Machine {
             match instruction {
                 NextPtr => {
                     self.next_ptr()?;
+                    self.pc += 1;
                 }
                 PrevPtr => {
                     self.prev_ptr()?;
+                    self.pc += 1;
                 }
                 Increment => {
                     self.increment();
+                    self.pc += 1;
                 }
                 Decrement => {
                     self.decrement();
+                    self.pc += 1;
                 }
                 Print => match char::from_u32(self.current_value() as u32) {
-                    Some(c) => print!("{}", c),
+                    Some(c) => {
+                        print!("{}", c);
+                        self.pc += 1;
+                    }
                     None => return Err(InvalidChar(self.current_value())),
                 },
+                Begin => {
+                    self.stack.push(self.pc);
+                    self.pc += 1;
+                }
+                End => match self.stack.pop() {
+                    Some(address) => {
+                        if self.current_value() != 0 {
+                            self.pc = address;
+                        } else {
+                            self.pc += 1;
+                        }
+                    }
+                    None => return Err(UnmatchedBeginEnd),
+                },
             }
-            self.pc += 1;
         }
 
         Ok(())
@@ -121,4 +147,6 @@ enum MachineError {
     InvalidChar(u8),
     #[error("Pointer access violation. Pointer must be more than or equal 0 and less than 256, but it is {0}")]
     PointerAccessViolation(isize),
+    #[error("Unmached Begin and end.")]
+    UnmatchedBeginEnd,
 }

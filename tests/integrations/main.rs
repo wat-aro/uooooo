@@ -42,3 +42,12 @@ fn abc_abc() {
         .success()
         .stdout("ABC\nABC\n");
 }
+
+#[test]
+fn hello_world() {
+    uooooo()
+        .arg("hello_world.bf")
+        .assert()
+        .success()
+        .stdout("Hello World!\n");
+}
