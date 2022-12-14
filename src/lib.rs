@@ -13,6 +13,7 @@ pub fn run(input: String) {
 #[derive(Debug)]
 enum Instruction {
     Increment,
+    Decrement,
     Print,
 }
 
@@ -22,6 +23,7 @@ fn parse(input: &str) -> Vec<Instruction> {
     for c in input.chars() {
         match c {
             '+' => instructions.push(Increment),
+            '-' => instructions.push(Decrement),
             '.' => instructions.push(Print),
             _ => {}
         }
@@ -54,6 +56,9 @@ impl Machine {
                 Increment => {
                     self.increment();
                 }
+                Decrement => {
+                    self.decrement();
+                }
                 Print => match char::from_u32(self.current_value() as u32) {
                     Some(c) => print!("{}", c),
                     None => return Err(InvalidChar(self.current_value())),
@@ -68,6 +73,12 @@ impl Machine {
     fn increment(&mut self) {
         if let Some(x) = self.memory.get_mut(self.current) {
             *x += 1;
+        }
+    }
+
+    fn decrement(&mut self) {
+        if let Some(x) = self.memory.get_mut(self.current) {
+            *x -= 1;
         }
     }
 

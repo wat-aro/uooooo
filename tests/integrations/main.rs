@@ -15,3 +15,12 @@ fn stdin() {
         .success()
         .stdout("ABC");
 }
+
+#[test]
+fn abc_and_newline() {
+    uooooo()
+        .arg("ABC_and_newline.bf")
+        .assert()
+        .success()
+        .stdout("ABC\n");
+}
