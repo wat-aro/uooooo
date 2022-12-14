@@ -33,3 +33,12 @@ fn abc_and_newline_next_ptr() {
         .success()
         .stdout("ABC\n");
 }
+
+#[test]
+fn abc_abc() {
+    uooooo()
+        .arg("ABCABC.bf")
+        .assert()
+        .success()
+        .stdout("ABC\nABC\n");
+}
