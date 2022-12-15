@@ -1,13 +1,14 @@
-use std::char;
+use std::{char, error::Error};
 use thiserror::Error;
 use Instruction::*;
 use MachineError::*;
 
-pub fn run(input: String) {
+pub fn run(input: String) -> Result<(), Box<dyn Error>> {
     let instructions = parse(&input[..]);
     let mut machine = Machine::new(instructions);
 
-    machine.run().unwrap();
+    machine.run()?;
+    Ok(())
 }
 
 #[derive(Debug)]
@@ -150,7 +151,7 @@ impl Machine {
 }
 
 #[derive(Error, Debug)]
-enum MachineError {
+pub enum MachineError {
     #[error("Invalid char code {0}")]
     InvalidChar(u8),
     #[error("Pointer access violation. Pointer must be more than or equal 0 and less than 256, but it is {0}")]

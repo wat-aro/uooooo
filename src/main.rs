@@ -1,6 +1,7 @@
 use std::{
     fs::File,
     io::{stdin, Read},
+    process::exit,
 };
 
 use atty::{self, Stream};
@@ -10,22 +11,45 @@ fn main() {
     if is_pipe() {
         let mut buf = String::new();
         match stdin().read_to_string(&mut buf) {
-            Ok(_) => uooooo::run(buf),
-            Err(_) => todo!(),
+            Ok(_) => match uooooo::run(buf) {
+                Ok(_) => exit(0),
+                Err(e) => {
+                    eprintln!("{}", e);
+                    exit(1);
+                }
+            },
+            Err(e) => {
+                eprintln!("{}", e);
+                exit(1);
+            }
         }
     } else {
         let matches = cli().get_matches();
 
         match matches.get_one::<String>("FILE") {
             Some(path) => {
-                let mut f = File::open(path).unwrap();
+                let mut f = match File::open(path) {
+                    Ok(file) => file,
+                    Err(e) => {
+                        eprintln!("'{}': No such file.", e);
+                        exit(1);
+                    }
+                };
                 let mut buf = String::new();
                 match f.read_to_string(&mut buf) {
-                    Ok(_) => uooooo::run(buf),
-                    Err(_) => todo!(),
+                    Ok(_) => match uooooo::run(buf) {
+                        Ok(_) => exit(0),
+                        Err(_) => todo!(),
+                    },
+                    Err(e) => {
+                        eprintln!("{}", e);
+                        exit(1);
+                    }
                 }
             }
-            None => cli().print_help().unwrap(),
+            None => {
+                cli().print_help().unwrap();
+            }
         }
     }
 }
