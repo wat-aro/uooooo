@@ -26,21 +26,43 @@ enum Instruction {
 fn parse(input: &str) -> Vec<Instruction> {
     let mut instructions = Vec::new();
 
-    for c in input.chars() {
-        match c {
-            '>' => instructions.push(NextPtr),
-            '<' => instructions.push(PrevPtr),
-            '+' => instructions.push(Increment),
-            '-' => instructions.push(Decrement),
-            '.' => instructions.push(Print),
-            ',' => instructions.push(Read),
-            '[' => instructions.push(Begin),
-            ']' => instructions.push(End),
-            _ => {}
+    let mut i = 0;
+
+    while i < input.chars().count() {
+        if substring(input, i, 1) == "う" {
+            instructions.push(NextPtr);
+            i += 1;
+        } else if substring(input, i, 2) == "おう" {
+            instructions.push(Read);
+            i += 2;
+        } else if substring(input, i, 4) == "おおうう" {
+            instructions.push(Begin);
+            i += 4;
+        } else if substring(input, i, 4) == "おおうお" {
+            instructions.push(End);
+            i += 4;
+        } else if substring(input, i, 4) == "おおおう" {
+            instructions.push(PrevPtr);
+            i += 4;
+        } else if substring(input, i, 5) == "おおおおう" {
+            instructions.push(Print);
+            i += 5;
+        } else if substring(input, i, 6) == "おおおおおう" {
+            instructions.push(Decrement);
+            i += 6;
+        } else if substring(input, i, 6) == "おおおおおお" {
+            instructions.push(Increment);
+            i += 6;
+        } else {
+            i += 1;
         }
     }
 
     instructions
+}
+
+fn substring(input: &str, begin: usize, len: usize) -> String {
+    input.chars().skip(begin).take(len).collect::<String>()
 }
 
 #[derive(Debug)]
@@ -171,7 +193,7 @@ impl Machine {
         }
 
         self.pc += 1;
-        return Ok(());
+        Ok(())
     }
 }
 
