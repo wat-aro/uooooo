@@ -135,13 +135,13 @@ impl Machine {
 
     fn increment(&mut self) {
         if let Some(x) = self.memory.get_mut(self.current) {
-            *x += 1;
+            *x = x.wrapping_add(1);
         }
     }
 
     fn decrement(&mut self) {
         if let Some(x) = self.memory.get_mut(self.current) {
-            *x -= 1;
+            *x = x.wrapping_sub(1);
         }
     }
 
