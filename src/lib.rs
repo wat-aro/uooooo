@@ -96,16 +96,16 @@ impl Machine {
                     }
                 }
                 Begin => {
-                    self.stack.push(self.pc);
-                    self.pc += 1;
+                    if self.current_value() == 0 {
+                        self.jump_to_end()?;
+                    } else {
+                        self.stack.push(self.pc);
+                        self.pc += 1;
+                    }
                 }
                 End => match self.stack.pop() {
                     Some(address) => {
-                        if self.current_value() != 0 {
-                            self.pc = address;
-                        } else {
-                            self.pc += 1;
-                        }
+                        self.pc = address;
                     }
                     None => return Err(UnmatchedBeginEnd),
                 },
@@ -147,6 +147,31 @@ impl Machine {
 
     fn current_value(&self) -> u8 {
         *self.memory.get(self.current).unwrap()
+    }
+
+    fn jump_to_end(&mut self) -> Result<(), MachineError> {
+        let mut counter = 1;
+
+        while counter != 0 {
+            self.pc += 1;
+            match self.instructions.get(self.pc) {
+                Some(instruction) => match instruction {
+                    Begin => {
+                        counter += 1;
+                    }
+                    End => {
+                        counter -= 1;
+                    }
+                    _ => {}
+                },
+                None => {
+                    return Err(UnmatchedBeginEnd);
+                }
+            }
+        }
+
+        self.pc += 1;
+        return Ok(());
     }
 }
 
