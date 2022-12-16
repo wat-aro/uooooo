@@ -8,15 +8,6 @@ fn basic() {
 }
 
 #[test]
-fn stdin() {
-    uooooo()
-        .write_stdin("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.+.+.\n")
-        .assert()
-        .success()
-        .stdout("ABC");
-}
-
-#[test]
 fn abc_and_newline() {
     uooooo()
         .arg("ABC_and_newline.bf")
